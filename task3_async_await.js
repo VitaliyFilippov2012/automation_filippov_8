@@ -15,8 +15,8 @@ async function getRandomNumberWithTimeout() {
 (async() => {
   let random_number = await getRandomNumberWithTimeout();
 
-  my_number == random_number ? console.log(`Угадал ${random_number}`) : 
-    console.log(`Проиграаал ты загадал ${random_number} , а я загадал ${my_number}`);
+  MY_NUMBER == random_number ? console.log(`Угадал ${random_number}`) : 
+    console.log(`Проиграаал ты загадал ${random_number} , а я загадал ${MY_NUMBER}`);
 })();
 
 
