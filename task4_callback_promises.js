@@ -10,7 +10,7 @@ function getMyAge(birthdayDate,callback) {
 getMyAge(new Date(2002,02,23), function(age) {
   let about_my_age = new Promise(function(resolve, reject) {
     if (age < 18) {
-      resolve("tenageer");
+      resolve("teenager");
     } else {
       reject("man");
     }

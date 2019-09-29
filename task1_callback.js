@@ -7,4 +7,4 @@ function getMyAge(birthdayDate, callback) {
   callback(age);
 }
 
-getMyAge(new Date(2000,02,23), age => console.log(`I'm ${age} years old.`));
+getMyAge(new Date(2000,2,23), age => console.log(`I'm ${age} years old.`));

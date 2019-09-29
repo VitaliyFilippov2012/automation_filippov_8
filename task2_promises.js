@@ -13,7 +13,7 @@ let promise_about_js = new Promise(function(resolve, reject) {
 promise_about_js.then(function(value) {
   console.log("Mom do not buy me a new computer because ", value);
   }).catch(function(value) {
-      console.log("Mom buy me a new computer because ", reason);
+      console.log("Mom buy me a new computer because ", value);
     }).finally(function() {
         console.log("I did my best");
     });

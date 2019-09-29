@@ -26,9 +26,9 @@ let promise_about_js = new Promise(function(resolve, reject) {
 promise_about_js.then(function(value) {
   console.log("Угадал: ", value);
   }).catch(function(value) {
-      console.log(`Не угадал. Я загадывал ${my_number}, а не ${value}`);
+      console.log(`Не угадал. Я загадывал ${MY_NUMBER}, а не ${value}`);
     }).finally(function() {
-        console.log("I did my best");
+        console.log("Я старался");
     });
 
 
