@@ -13,7 +13,7 @@ let sortedFiles =[];
 viewInfo();
 getFilesWithExpAndDeep(EXPANSION,DIR_PATH,NUMBER_DEEP_DIRS);
 sortByTime();
-viewFirstNfiles(NUMBER_OUT_FILES);
+viewFirstNFiles(NUMBER_OUT_FILES);
 
 function viewInfo() {
   console.log("Path: " + DIR_PATH);
@@ -32,7 +32,7 @@ function getFilesWithExpAndDeep(expansion, dirPath, numberDeepDirs) {
           files.push( PATH.join(dirPath, p) );
         }
       } else{
-        if(numberDeepDirs!=0) {
+        if(numberDeepDirs!==0) {
           getFilesWithExpAndDeep(expansion, PATH.join(dirPath,p),numberDeepDirs-1);
         }
       }
@@ -72,7 +72,7 @@ function sortByTime() {
   }
 }
 
-function viewFirstNfiles(n) {
+function viewFirstNFiles(n) {
   if(sortedFiles.length > n) {
     let countPop = sortedFiles.length - n;
 
