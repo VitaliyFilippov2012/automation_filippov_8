@@ -1,86 +1,65 @@
 require('chromedriver');
 require('geckodriver');
-const { Builder, By, Key, until } = require('selenium-webdriver');
+require('jasmine');
 const Config = require('../../testData.js');
-let browser = 'chrome';
+const SearchPage = require('./SearchPage.js');
+const ResultsPage = require('./ResultsPage.js');
+const { Builder } = require('selenium-webdriver');
 
-if (process.argv.length > 2) {
-    browser = process.argv[2];
+jasmine.DEFAULT_TIMEOUT_INTERVAL = Config.jasmineInterval;
+
+let browser = 'chrome';
+if (process.argv.length > 2){
+    browser = process.argv[2].slice(process.argv[2].indexOf('=')+1);
 }
 
 let driver = new Builder().forBrowser(browser).build();
-let resultsCount = 0;
-let dateStarted;
 
-beforeAll(function (done) {
-    driver.get('https://google.com').then(() => {
-        driver.findElement(By.name('q')).then(tag => {
-            tag.sendKeys(Config.searchString).then(() => {
-                tag.sendKeys(Key.ENTER).then(() => {
-                    done();
-                });
-            });
-        });
+beforeAll(async function (done) {
+    await SearchPage.setDriver(driver);
+    await SearchPage.open(Config.googleURL);
+    await SearchPage.writeSearch(Config.searchString).then(() => {
+        driver = SearchPage.getDriver();
+        done();
     });
-    dateStarted = new Date();
-}, 15000);
+},20000);
 
 afterAll(async function() {
+    ResultsPage.setDriver(driver);
+    console.log(await ResultsPage.getNumOfResults());
+    console.log(await ResultsPage.getTimeOfSearching());
     await driver.quit();
-    console.log(`\nResults: ${resultsCount}`);
-    console.log(`Time: ${new Date() - dateStarted}ms`);
-}, 15000);
+});
 
 describe('Google-search', function () {
-    it('Text exists on the first page', function (done) {
-        driver.wait(async function () {
-            const readyState = await driver.executeScript('return document.readyState');
-            return readyState === 'complete';
-        }).then(() => {
-            driver.getPageSource().then(source => {
-                expect(source.includes(Config.searchString)).toBe(true);
-                done();
-            });
-        });
-    }, 20000);
 
-    it('Text exists in url of the first page', function(done) {
-        driver.getCurrentUrl().then(url => {
-            expect(url.includes(Config.searchString)).toBe(true);
-            done();
-        });
-    }, 10000);
-
-    it('Text exists on the second page', async function (done) {
-        await driver.wait(until.elementLocated(By.id('pnnext')));
-        await driver.findElement(By.id('pnnext'))
-            .then(element => element.click());
-        await driver.wait(async function () {
-            const readyState = await driver.executeScript('return document.readyState');
-            return readyState === 'complete';
-        });
-        driver.getPageSource().then(source => {
-            expect(source.includes(Config.searchString)).toBe(true);
-            done();
-        });
-    }, 10000);
-    
-    it('Text exists in url of the second page', function(done) {
-        driver.getCurrentUrl().then(url => {
-            expect(url.includes(Config.searchString)).toBe(true);
-            done();
-        });
-    }, 10000);
-
-    it('Results count greater than x', async function(done) {
-        let element = await driver.wait(until.elementLocated(By.id('resultStats')));
-        let text = await element.getText();
-        let regex = /((\d+\s*)+)/;
-        let found = text.match(regex)[1];
-        found = found.replace(' ', '');
-        resultsCount = parseInt(found);
-        expect(resultsCount).toBeGreaterThan(Config.expectedResults);
+    it('Text exists on the text first page', async function (done) {
+        await ResultsPage.setDriver(driver);
+        let res = await ResultsPage.getBlock();
+        for (let result of res) {
+            let text = await result.getText();
+            expect(text.toLowerCase()).toContain(Config.searchString.toLowerCase());
+        }
         done();
-    }, 15000);
+    },200000);
 
+    it('Text exists on the text second page', async function (done) {
+        await  ResultsPage.setDriver(driver);
+        await  ResultsPage.goNextPage();
+        driver = ResultsPage.getDriver();
+        await ResultsPage.setDriver(driver);
+        let res = await ResultsPage.getBlock();
+        for (let result of res) {
+            let text = await result.getText();
+            expect(text.toLowerCase()).toContain(Config.searchString.toLowerCase());
+        }
+        done();
+    },20000);
+
+    it('Results count greater than x', async function (done) {
+        await ResultsPage.setDriver(driver);
+        let numRes = await ResultsPage.getNumOfResults();
+        expect(+numRes.replace(/\D+/g, "")).toBeGreaterThan(Config.expectedResults);
+        done();
+    },20000);
 });
