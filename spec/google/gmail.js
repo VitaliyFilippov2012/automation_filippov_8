@@ -1,7 +1,9 @@
 const fs = require('fs-extra');
+const base64 = require('js-base64').Base64;
 const { google }= require('googleapis');
 const TOKEN_PATH = 'token.json';
 let messageCountWithAutomation = 0;
+
 exports.authorize = function authorize(logger) {
     logger.debug('gmail.js(authorize)');
     let content = fs.readFileSync('credentials.json');
@@ -32,16 +34,17 @@ function getSubject(logger,messageData) {
     return messageSubject;
 }
 
-function getDeadLine(logger,body) {
+async function getDeadLine(logger,body) {
     try{
         logger.debug('gmail.js(getDeadLine)');
-        let deadLine = undefined;
-        let pattern = /(Срок его выполнения)[\W\w]*[:][0-9]+/;
-        let match = body.match(pattern);
-        return match[0];
+        //let pattern = /(Срок его выполнения)[\W\w]*[:][0-9]+/;
+        //let match = body.match(pattern);
+        //let deadLine = match[0];
+        let findStr = "выполнения";
+        let deadline = await body.slice(body.indexOf(findStr)+findStr.length+3, body.indexOf(findStr)+findStr.length+33);
         logger.info('DeadLine of task: '+deadLine);
         logger.debug('end of gmail.js(getDeadLine)');
-        return messageSubject;
+        return deadline;
     }
     catch (e) {
         logger.warn("I can not handle the encoding and get the message text")
@@ -49,33 +52,34 @@ function getDeadLine(logger,body) {
     }
 }
 
-function getBody(logger,messageData) {
+async function getBody(logger,messageData) {
     logger.debug('gmail.js(getBody)');
-    let messageFullBody = '';
-    let data = Buffer.from(messageData.data.payload.parts.toString(), 'base64');
-    messageFullBody += data.toString();
-
-    logger.info('Body of message: '+ messageFullBody);
+    let bodyData = await messageData.data.payload.parts[0].body.data;
     logger.debug('end of gmail.js(getBody)');
-    return messageFullBody;
+    return base64.decode(bodyData).replace(/[*]/g, '');
 }
+
+async function getMessageData(id,auth){
+    const gmail = await google.gmail({ version: 'v1', auth });
+    return await gmail.users.messages.get({
+        userId: 'me',
+        id: id
+    });
+}
+
 
 async function logMessageData(logger, messageId, auth) {
     logger.debug('Started log message');
     logger.debug('gmail.js(logMessageData)');
-    const gmail = google.gmail({ version: 'v1', auth });
 
-    let messageData = await gmail.users.messages.get({
-        userId: 'me',
-        id: messageId
-    });
-
+    let messageData = await getMessageData(messageId,auth)
     let messageSubject = getSubject(logger,messageData);
 
     if (messageSubject.includes('Automation')) {
         messageCountWithAutomation += 1 ;
-        let messageFullBody = getBody(logger,messageData);
-        logger.info(`Задание: ${messageSubject}. ${getDeadLine(logger,messageFullBody)}\r\nТело письма:\r\n${messageFullBody}`);
+        let messageFullBody = await  getBody(logger,messageData);
+        let deadline = await getDeadLine(logger,messageFullBody);
+        logger.info(`Задание: ${messageSubject}. ${deadline}\r\nТело письма:\r\n${messageFullBody}`);
     } else {
         logger.warn('Subject is inappropriate');
     }
