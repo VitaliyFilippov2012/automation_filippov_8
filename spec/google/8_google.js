@@ -6,7 +6,7 @@ const logger = require('./Log');
 let auth;
 let messagesAmount = 0;
 
-beforeAll(async function (done) {
+beforeAll(async function () {
     logger.debug('Authorization');
     auth = gmailApi.authorize(logger);
     logger.debug('end of authorization');
@@ -15,15 +15,13 @@ beforeAll(async function (done) {
     messagesAmount = await gmailApi.getMessagesAmount(logger, auth);
     logger.debug('end of it "Get messages amount"');
     logger.info('Message count: '+messagesAmount);
-    done();
     },20000);
 
 describe('GmailApi', function() {
-    beforeAll(async function(done) {
+    beforeAll(async function() {
         logger.debug('Messages Analysis');
         await gmailApi.analysisMessages(logger,auth);
         logger.debug('end of it "Messages Analysis"');
-        done();
     },200000);
 
     it('The total number of messages equals 2', function() {

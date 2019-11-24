@@ -1,5 +1,4 @@
 const fs = require('fs-extra');
-const base64 = require('js-base64').Base64;
 const { google }= require('googleapis');
 const TOKEN_PATH = 'token.json';
 let messageCountWithAutomation = 0;
@@ -36,15 +35,9 @@ function getSubject(logger,messageData) {
 
 async function getDeadLine(logger,body) {
     try{
-        logger.debug('gmail.js(getDeadLine)');
-        //let pattern = /(Срок его выполнения)[\W\w]*[:][0-9]+/;
-        //let match = body.match(pattern);
-        //let deadLine = match[0];
-        let findStr = "выполнения";
-        let deadline = await body.slice(body.indexOf(findStr)+findStr.length+3, body.indexOf(findStr)+findStr.length+33);
-        logger.info('DeadLine of task: '+deadLine);
-        logger.debug('end of gmail.js(getDeadLine)');
-        return deadline;
+        let pattern = /(\d+\s[А-Яа-я]+,\s\d+:\d+)/;
+        let match = body.match(pattern);
+        return match[0];
     }
     catch (e) {
         logger.warn("I can not handle the encoding and get the message text")
@@ -53,10 +46,14 @@ async function getDeadLine(logger,body) {
 }
 
 async function getBody(logger,messageData) {
-    logger.debug('gmail.js(getBody)');
-    let bodyData = await messageData.data.payload.parts[0].body.data;
-    logger.debug('end of gmail.js(getBody)');
-    return base64.decode(bodyData).replace(/[*]/g, '');
+    let messageFullBody = '';
+    for (let { body } of messageData.data.payload.parts) {
+        if (body.data != undefined) {
+            let data = Buffer.from(body.data, 'base64');
+            messageFullBody += data.toString();
+        }
+    }
+    return messageFullBody;
 }
 
 async function getMessageData(id,auth){
