@@ -1,7 +1,7 @@
 # Appium task 10
 
-#Preparing
+# Preparing
 npm install
 
-#Run
+# Run
 npm test
