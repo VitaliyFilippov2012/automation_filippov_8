@@ -1,0 +1,26 @@
+{
+  "name": "steam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "chromedriver": "^79.0.0",
+    "jasmine": "^3.5.0",
+    "open": "^7.0.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "webdriver": "^5.16.13",
+    "opn": "^6.0.0",
+    "selenium-webdriver": "^4.0.0-alpha.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node ./node_modules/jasmine/bin/jasmine.js",
+    "report": "node ./report.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
