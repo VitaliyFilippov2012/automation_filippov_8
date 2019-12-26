@@ -9,14 +9,7 @@ const downloadPage = require('./steam/pages/DownloadSteamPage');
 const config = require('./steam/support/config');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = config.DEFAULT_TIMEOUT;
 
-let chromeCapabilities = webdriver.Capabilities.chrome();
-let chromeOptions = {
-    'prefs': {"download.default_directory":config.download_path}
-};
-chromeCapabilities.set('chromeOptions', chromeOptions);
-let driver = new Builder()
-    .withCapabilities(chromeCapabilities)
-    .build();
+let driver = new Builder().forBrowser('chrome').build();
 
 let textPrice, textFinalPrice, textDiscount, price, disc;
 

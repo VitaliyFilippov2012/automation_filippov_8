@@ -1,6 +1,6 @@
 const Page = require('./Page');
 const {By, until } = require('selenium-webdriver');
-const config = require('../support/config');
+const downloadsFolder = require('downloads-folder');
 const fs = require('fs');
 const path = require('path');
 let driver;
@@ -20,9 +20,9 @@ class steamPage extends Page {
     async waitDownload(){
         let isDownloaded = false;
         while (!isDownloaded) {
-            let files = fs.readdirSync(config.download_path);
+            let files = fs.readdirSync(downloadsFolder());
             for (let file of files) {
-                let filename = path.join(config.download_path, file);
+                let filename = path.join(downloadsFolder(), file);
                 if(path.extname(file)===`.crdownload`){
                     isDownloaded = false;
                 }

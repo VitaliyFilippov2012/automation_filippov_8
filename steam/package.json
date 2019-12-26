@@ -7,14 +7,16 @@
     "lib": "lib"
   },
   "dependencies": {
+    "browser": "^0.2.6",
     "chromedriver": "^79.0.0",
+    "downloads-folder": "^1.0.2",
+    "fs": "^0.0.1-security",
     "jasmine": "^3.5.0",
     "open": "^7.0.0",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7",
-    "webdriver": "^5.16.13",
     "opn": "^6.0.0",
-    "selenium-webdriver": "^4.0.0-alpha.5"
+    "path": "^0.12.7",
+    "selenium-webdriver": "^4.0.0-alpha.5",
+    "webdriver": "^5.16.13"
   },
   "devDependencies": {},
   "scripts": {
